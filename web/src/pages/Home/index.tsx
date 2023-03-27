@@ -1,14 +1,22 @@
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { AddTask } from '../../components/AddTask';
 import TodoList from '../../components/TodoList';
 import { mockTasks } from '../../mocks/tasks';
+import { getAllTasks } from '../../services/querys/tasks';
 import { Task } from '../../types/Tasks';
 
 const Home = () => {
-  const [tasks, setTasks] = useState(mockTasks);
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  const {} = useQuery(['todoList'], () => getAllTasks(), {
+    onSuccess: (data) => setTasks(data),
+  });
+
+  // console.log(data);
 
   const handleChangeTask = (taskId: number) => {
-    const updatedTasks = tasks.map((task) =>
+    const updatedTasks = tasks?.map((task) =>
       task.id === taskId ? { ...task, completed: !task.completed } : task
     );
 
@@ -17,7 +25,7 @@ const Home = () => {
 
   const handleTaskAdd = (title: string) => {
     const newTask: Task = {
-      id: tasks.length + 1,
+      id: tasks?.length + 1,
       title,
       completed: false,
     };
@@ -38,6 +46,9 @@ const Home = () => {
         onTaskComplete={handleChangeTask}
         tasks={tasks}
       />
+      {tasks.length === 0 && (
+        <span className='p-8'>Nenhuma tarefa no momento!</span>
+      )}
     </div>
   );
 };
